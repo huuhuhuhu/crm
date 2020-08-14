@@ -9,6 +9,7 @@ import com.jiabin.crm.utils.ServiceFactory;
 import com.jiabin.crm.utils.UUIDUtil;
 import com.jiabin.crm.workbench.domain.Activity;
 import com.jiabin.crm.workbench.domain.Clue;
+import com.jiabin.crm.workbench.domain.Tran;
 import com.jiabin.crm.workbench.service.ActivityService;
 import com.jiabin.crm.workbench.service.ClueService;
 import com.jiabin.crm.workbench.service.impl.ActivityServiceImpl;
@@ -63,20 +64,46 @@ public class ClueController extends HttpServlet {
 
     }
 
-    private void convert(HttpServletRequest request, HttpServletResponse response) {
+    private void convert(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
         System.out.println("执行线索转换的操作");
         String clueId=request.getParameter("clueId");
         //接收是否需要创建交易的标记
         String flag=request.getParameter("flag");
-
+        //如果需要创建交易，则t不为null, 业务层由此来判断是否需要创建交易，另外，如果需要创建交易，肯定要把交易信息
+        //传到业务层，如果只是用flag的话，就需要传递两个参数，这样就只要传递一个参数
+        Tran t=null;
+        //创建人，当前登录用户
+        String createBy= ((User) request.getSession().getAttribute("user")).getName();
         //如果需要创建交易
         if ("a".equals(flag)){
+            t=new Tran();
+            //接收交易表单中的参数
+            String money=request.getParameter("money");
+            String name=request.getParameter("name");
+            String expectedDate=request.getParameter("expectedDate");
+            String stage=request.getParameter("stage");
+            String activityId=request.getParameter("activityId");
+            String id=UUIDUtil.getUUID();
+            //创建时间，当前系统时间
+            String createTime= DateTimeUtil.getSysTime();
+
+            t.setMoney(money);
+            t.setName(name);
+            t.setExpectedDate(expectedDate);
+            t.setStage(stage);
+            t.setActivityId(activityId);
+            t.setId(id);
+            t.setCreateTime(createTime);
+            t.setCreateBy(createBy);
+        }
+        ClueService cs= (ClueService) ServiceFactory.getService(new ClueServiceImpl());
+        boolean flag1=cs.convert(clueId,t,createBy);
+        //传统请求，响应有两种方式，转发和重定向，使用同一块请求域用转发，不然使用重定向
+        if (flag1){
+            response.sendRedirect(request.getContextPath()+"/workbench/clue/index.jsp");
 
         }
-        //不需要创建交易
-        else{
 
-        }
     }
 
     private void getActivityListByName(HttpServletRequest request, HttpServletResponse response) {
