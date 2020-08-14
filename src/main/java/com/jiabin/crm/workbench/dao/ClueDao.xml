@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jiabin.crm.workbench.dao.ClueDao">
+    <select id="detail" resultType="Clue">
+        select
+                t.id,
+                t.fullname,
+                t.appellation,
+                u.name as owner,
+                t.company,
+                t.job,
+                t.email,
+                t.phone,
+                t.website,
+                t.mphone,
+                t.state,
+                t.source,
+                t.createBy,
+                t.createTime,
+                t.editBy,
+                t.editTime,
+                t.description,
+                t.contactSummary,
+                t.nextContactTime,
+                t.address
+
+
+        from tbl_clue t
+        join tbl_user u
+        on t.owner=u.id
+        where t.id=#{id}
+
+    </select>
+
+    <insert id="save">
+        insert  into tbl_clue (
+                        id,
+                        fullname,
+                        appellation,
+                        owner,
+                        company,
+                        job,
+                        email,
+                        phone,
+                        website,
+                        mphone,
+                        state,
+                        source,
+                        createBy,
+                        createTime,
+                        description,
+                        contactSummary,
+                        nextContactTime,
+                        address
+
+        )values (
+                        #{id},
+                        #{fullname},
+                        #{appellation},
+                        #{owner},
+                        #{company},
+                        #{job},
+                        #{email},
+                        #{phone},
+                        #{website},
+                        #{mphone},
+                        #{state},
+                        #{source},
+                        #{createBy},
+                        #{createTime},
+                        #{description},
+                        #{contactSummary},
+                        #{nextContactTime},
+                        #{address}
+
+
+
+        )
+
+
+    </insert>
+
+	
+	
+  	
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
