@@ -24,6 +24,10 @@
   <url-pattern>*.do</url-pattern>
   <url-pattern>*.jsp</url-pattern>
 </filter-mapping>
+  
+  <listener>
+    <listener-class>com.jiabin.crm.web.listener.SysInitListener</listener-class>
+  </listener>
 
 
 <!--用户控制器-->

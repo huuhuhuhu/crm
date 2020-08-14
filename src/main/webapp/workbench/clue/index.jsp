@@ -148,14 +148,14 @@ request.getContextPath() + "/";
 							<div class="col-sm-10" style="width: 300px;">
 								<select class="form-control" id="create-appellation">
 								  <option></option>
-									<c:forEach items="${appellationList}" var="a">
+									<%--<c:forEach items="${appellationList}" var="a">
 										<option value="${a.value}">${a.text}</option>
-									</c:forEach>
-								  <%--<option>先生</option>
+									</c:forEach>--%>
+								  <option>先生</option>
 								  <option>夫人</option>
 								  <option>女士</option>
 								  <option>博士</option>
-								  <option>教授</option>--%>
+								  <option>教授</option>
 								</select>
 							</div>
 							<label for="create-surname" class="col-sm-2 control-label">姓名<span style="font-size: 15px; color: red;">*</span></label>
@@ -214,9 +214,9 @@ request.getContextPath() + "/";
 							<div class="col-sm-10" style="width: 300px;">
 								<select class="form-control" id="create-source">
 								  <option></option>
-									<c:forEach items="${sourceList}" var="a">
+									<%--<c:forEach items="${sourceList}" var="a">
 										<option value="${a.value}">${a.text}</option>
-									</c:forEach>
+									</c:forEach>--%>
 								</select>
 							</div>
 						</div>

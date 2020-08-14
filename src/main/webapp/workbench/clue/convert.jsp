@@ -243,9 +243,9 @@ String appellation=request.getParameter("appellation");
 		    <label for="stage">阶段</label>
 		    <select id="stage"  class="form-control" name="stage">
 		    	<option></option>
-		    	<c:forEach items="${stageList}" var="s">
+		    	<%--<c:forEach items="${stageList}" var="s">
 					<option value="${s.value}">${s.text}</option>
-				</c:forEach>
+				</c:forEach>--%>
 		    </select>
 		  </div>
 		  <div class="form-group" style="width: 400px;position: relative; left: 20px;">
