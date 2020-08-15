@@ -63,6 +63,29 @@ public class SysInitListener implements ServletContextListener {
 
         System.out.println("服务器缓存处理数据字典结束");
 
+        //===================================================================================
+        /*
+            数据字典处理完毕后，处理Stage2Possibility.properties文件
+            1. 解析该文件
+            2.将该属性文件中的键值对关系处理成为Java中的键值对关系
+            Map<String(阶段），String(可能性）>
+            保存在上下文作用域对象中
+         */
+        //解析属性配置文件
+        Map<String,String> pMap=new HashMap<>();
+        ResourceBundle rb=ResourceBundle.getBundle("Stage2Possibility");
+        Enumeration<String> e=rb.getKeys();
+        while(e.hasMoreElements()){
+            //阶段
+            String key=e.nextElement();
+            //可能性
+            String value=rb.getString(key);
+            pMap.put(key,value);
+        }
+
+        //将pMap保存到服务器缓存中
+        application.setAttribute("pMap",pMap);
+
 
 
     }

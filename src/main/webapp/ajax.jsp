@@ -32,6 +32,10 @@ String createTime= DateTimeUtil.getSysTime();
 String createBy= ((User) request.getSession().getAttribute("user")).getName();
 
 
+
+
+
+//加载时间控件
 $(".time").datetimepicker({
 minView: "month",
 language:  'zh-CN',
