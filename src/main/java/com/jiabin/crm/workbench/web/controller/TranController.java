@@ -10,6 +10,7 @@ import com.jiabin.crm.utils.UUIDUtil;
 import com.jiabin.crm.workbench.domain.Activity;
 import com.jiabin.crm.workbench.domain.Clue;
 import com.jiabin.crm.workbench.domain.Tran;
+import com.jiabin.crm.workbench.domain.TranHistory;
 import com.jiabin.crm.workbench.service.ActivityService;
 import com.jiabin.crm.workbench.service.ClueService;
 import com.jiabin.crm.workbench.service.CustomerService;
@@ -19,6 +20,7 @@ import com.jiabin.crm.workbench.service.impl.ClueServiceImpl;
 import com.jiabin.crm.workbench.service.impl.CustomerServiceImpl;
 import com.jiabin.crm.workbench.service.impl.TranServiceImpl;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -47,7 +49,93 @@ public class TranController extends HttpServlet {
         else if ("/workbench/transaction/save.do".equals(path)){
             save(request,response);
         }
+        else if ("/workbench/transaction/detail.do".equals(path)){
+            detail(request,response);
+        }
+        else if ("/workbench/transaction/getHistoryListByTranId.do".equals(path)){
+            getHistoryListByTranId(request,response);
+        }
+        else if ("/workbench/transaction/changeStage.do".equals(path)){
+            changeStage(request,response);
+        }
+        else if ("/workbench/transaction/getCharts.do".equals(path)){
+            getCharts(request,response);
+        }
+    }
 
+    private void getCharts(HttpServletRequest request, HttpServletResponse response) {
+        System.out.println("取得交易阶段数量统计图表的数据");
+        TranService ts= (TranService) ServiceFactory.getService(new TranServiceImpl());
+        /**
+         * 业务层为我们返回total 和dataList
+         * 通过map打包以上两项返回
+         */
+        Map<String,Object> map=ts.getCharts();
+        PrintJson.printJsonObj(response,map);
+    }
+
+    private void changeStage(HttpServletRequest request, HttpServletResponse response) {
+        System.out.println("执行修改阶段的操作");
+        String id=request.getParameter("id");
+        String stage=request.getParameter("stage");
+        String expectedDate=request.getParameter("expectedDate");
+        String money=request.getParameter("money");
+        String editTime= DateTimeUtil.getSysTime();
+        String editBy= ((User) request.getSession().getAttribute("user")).getName();
+        Tran t=new Tran();
+        t.setEditTime(editTime);
+        t.setEditBy(editBy);
+        t.setMoney(money);
+        t.setExpectedDate(expectedDate);
+        t.setStage(stage);
+        t.setId(id);
+        TranService ts= (TranService) ServiceFactory.getService(new TranServiceImpl());
+        boolean flag=ts.changeStage(t);
+        Map<String,Object> map=new HashMap<>();
+        ServletContext application=this.getServletContext();
+        Map<String,String> pMap= (Map<String, String>) application.getAttribute("pMap");
+        t.setPossibility(pMap.get(stage));
+        map.put("success",flag);
+        map.put("t",t);
+        PrintJson.printJsonObj(response,map);
+
+    }
+
+    private void getHistoryListByTranId(HttpServletRequest request, HttpServletResponse response) {
+        System.out.println("根据交易id取交易历史列表");
+        String tranId=request.getParameter("tranId");
+        TranService ts= (TranService) ServiceFactory.getService(new TranServiceImpl());
+        List<TranHistory> thList=ts.getHistoryListByTranId(tranId);
+        //阶段和可能性之间的关系
+        ServletContext application=this.getServletContext();
+        Map<String,String> pMap= (Map<String, String>) application.getAttribute("pMap");
+
+        //将交易历史遍历
+        for (TranHistory th:thList){
+            String stage=th.getStage();
+            String possibility=pMap.get(stage);
+            th.setPossibility(possibility);
+        }
+        PrintJson.printJsonObj(response,thList);
+    }
+
+    private void detail(HttpServletRequest request, HttpServletResponse response)throws ServletException, IOException {
+        System.out.println("进入交易的详情页");
+        String id=request.getParameter("id");
+        TranService ts= (TranService) ServiceFactory.getService(new TranServiceImpl());
+        Tran t=ts.detail(id);
+        //处理可能性
+        String stage=t.getStage();
+        ServletContext application=this.getServletContext();
+        Map<String,String> pMap= (Map<String, String>) application.getAttribute("pMap");
+        String possibility=pMap.get(stage);
+        /*
+            当需要将一些字段封装到请求对象中时，如果字段很少，也可以在实体类中扩充
+         */
+        //request.setAttribute("possibility",possibility);
+        t.setPossibility(possibility);
+        request.setAttribute("t",t);
+        request.getRequestDispatcher("/workbench/transaction/detail.jsp").forward(request,response);
     }
 
     private void save(HttpServletRequest request, HttpServletResponse response)throws ServletException, IOException {
